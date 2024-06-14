@@ -21,3 +21,7 @@ class CreateChannelSerializer(serializers.ModelSerializer):
 class AcceptChannelSerializer(serializers.ModelSerializer):
     channel_id = serializers.IntegerField()
     secret_key = serializers.CharField(max_length=60)
+
+    class Meta:
+        model = Channel
+        fields = ['channel_id', 'secret_key']
