@@ -37,3 +37,4 @@ class ChannelTests(APITestCase):
         response = self.client.post('/api/generate-key/', {'channel_id': channel.id, 'secret_key': '1234567890abcdef'})
         self.assertEqual(response.status_code, 200)
         self.assertIn('key', response.data)
+
