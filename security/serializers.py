@@ -15,12 +15,12 @@ class ChannelSerializer(serializers.ModelSerializer):
 class CreateChannelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Channel
-        fields = ['recipient_user']
+        fields = ['id', 'name', 'sender_user', 'recipient_user', 'accepted']
 
 
 class AcceptChannelSerializer(serializers.ModelSerializer):
     channel_id = serializers.IntegerField()
-    secret_key = serializers.CharField(max_length=60)
+    secret_key = serializers.CharField(max_length=64)
 
     class Meta:
         model = Channel

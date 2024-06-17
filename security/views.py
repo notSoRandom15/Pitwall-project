@@ -48,6 +48,25 @@ class ChannelViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SecretExchangeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        channel_id = request.data.get('channel_id')
+        channel = Channel.objects.get(pk=channel_id)
+        secret_key = int.from_bytes(os.urandom(32), 'big')  # Generate a 256-bit key
+        if channel.accepted:
+            if request.user == channel.sender_user:
+                channel.initial_sender_secret = pow(Base, secret_key, Modulus)
+                channel.save()
+                return Response({'secret_key': format(secret_key, 'x')}, status=status.HTTP_200_OK)
+            elif request.user == channel.recipient_user:
+                channel.initial_recipient_secret = pow(Base, secret_key, Modulus)
+                channel.save()
+                return Response({'secret_key': format(secret_key, 'x')}, status=status.HTTP_200_OK)
+        return Response({'error': 'Unauthorized or channel not accepted'}, status=status.HTTP_403_FORBIDDEN)
+
+
 class KeyGenerationView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -62,4 +81,3 @@ class KeyGenerationView(APIView):
             key = pow(channel.initial_sender_secret, secret_key, Modulus)
             return Response({'key': key}, status=status.HTTP_200_OK)
         return Response({'error': 'Unauthorized or channel not accepted'}, status=status.HTTP_403_FORBIDDEN)
-
